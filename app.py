@@ -35,21 +35,42 @@ class links:
 
         allcount = len(urls)
         count = 1
-        good = 0  # 代表有效的外链
+
+        code_report = {
+            '2xx': 0,
+            '3xx': 0,
+            '4xx': 0,
+            '5xx': 0
+        }  # 代表各个状态码的链接数量
+
         results = pool.map(self.push, urls)
         for i in results:
             code, url = i
-            if code < 500:
-                good = good + 1
+            self.code(code_dict=code_report, code=code)
             print(f'{count / allcount:.2%} >>> {count} / {allcount} >>> {code} {url}')
             count = count + 1
-        print('>>> 已全部分发完毕~\n'
-              f'有效外链：{good}\n'
-              f'无效外链：{allcount - good}')
+
+        print('\n>>> 已全部分发完毕~')
+        print('>>> 各个状态码的情况分布：')
+        for k, v in code_report.items():
+            print(f'{k}：{v}')
+
+    def code(self, code_dict: dict, code: int):
+        """code_dict代表各个状态码的数量
+        code代表状态码"""
+        if code < 300:
+            code_dict['2xx'] = code_dict['2xx'] + 1
+        elif code < 400:
+            code_dict['3xx'] = code_dict['3xx'] + 1
+        elif code < 500:
+            code_dict['4xx'] = code_dict['4xx'] + 1
+        else:
+            code_dict['5xx'] = code_dict['5xx'] + 1
 
 
 if __name__ == '__main__':
-    print('作者：勿埋我心 - SkyQian'
+    print('外链分发工具 v1.1\n'
+          '作者：勿埋我心 - SkyQian\n'
           '我的博客：https://www.skyqian.com\n'
           'YiOVE官网：https://www.yiove.com\n'
           'Github：https://github.com/Qiantigers/website-link-tool-python\n'
